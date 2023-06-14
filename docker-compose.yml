@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    command: ["sh","-c","python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+    depends_on:
+      - redis
+    env_file:
+      - docker.env
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["sh","-c","celery -A social_network worker --loglevel=info"]
+    depends_on:
+      - redis
+    env_file:
+      - docker.env
+  redis:
+    image: redis:latest
